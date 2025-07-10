@@ -1,13 +1,14 @@
 import networkx as nx
-from random import randint
+import random
 import matplotlib.pyplot as plt
 
-mendonza = ['Letos','Alberto','Rodrigo','Karla','Lucy']
+mendonza = ['Letos','Norbert','Rodrigo','Karla']
+chavos = ['Alberto','Lucy']
 vidal = ['Conrado','Gina','Jesus']
 boston = ['Lupis','Mau']
 chilangos = ['Carmen','Gabriel','Gaby','Javier']
-familia = mendonza + vidal + boston + chilangos
-familias = [mendonza, vidal, boston, chilangos]
+familia = mendonza + chavos + vidal + boston + chilangos
+familias = [mendonza, chavos, vidal, boston, chilangos]
 
 G = nx.Graph()
 G.add_nodes_from(familia)
@@ -27,6 +28,8 @@ color_map = []
 for persona in familia:
     if persona in mendonza:
         color_map.append('red')
+    elif persona in chavos:
+        color_map.append('purple')
     elif persona in vidal:
         color_map.append('blue')
     elif persona in boston:
@@ -34,6 +37,29 @@ for persona in familia:
     elif persona in chilangos:
         color_map.append('orange')
 
+disponibles_para_dar = familia.copy()
+asignaciones = {}
+ya_recibieron = set()
+
+while disponibles_para_dar:
+    persona1 = random.choice(disponibles_para_dar)
+    vecinos_validos = list(G.neighbors(persona1))
+    vecinos_validos = [v for v in vecinos_validos if v not in ya_recibieron]
+
+    if not vecinos_validos:
+        print(f"⚠️ No hay a quién regalar para {persona1}, reinicia la rifa")
+        break  # o podrías reiniciar desde cero aquí
+
+    persona2 = random.choice(vecinos_validos)
+
+    asignaciones[persona1] = persona2
+    ya_recibieron.add(persona2)
+    disponibles_para_dar.remove(persona1)
+
+# Mostrar resultados
+print("Resultados del intercambio:")
+for quien, a_quien in asignaciones.items():
+    print(f"{quien} le regala a {a_quien}")
 
 # Dibujar
 fig, ax = plt.subplots(figsize=(15, 15))
